@@ -1,0 +1,54 @@
+#
+# Copyright 2024 nou Systems, Inc.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+id: nouradio_test_stop_and_close
+label: 'Test: Stop and Close'
+category: '[nouRadio Test]'
+
+templates:
+  imports: from gnuradio import nouradio_test
+  make: |-
+      None
+      def ${ 'stop_flowgraph_' + context.get('id')() }():
+          import time
+          # Some USB radios require a more elegant closing process,
+          # so pass along a callback to the Qt functions.
+          self.setAttribute(Qt.Qt.WA_DeleteOnClose)
+          # Stopping and exiting the program gracefully requires multiple pieces.
+          # Note that calling self.close() does not work within this callback.
+          # The program stops, but the window never closes.
+          self.stop()
+          time.sleep(${ delay_before_close_s })
+          Qt.QApplication.quit()
+      self.${context.get('id')()} = nouradio_test.stop_and_close("${ type }", ${ test_name_filter }, int(${ stop_after_sample }), ${ 'stop_flowgraph_' + context.get('id')() })
+
+parameters:
+- id: type
+  label: Type
+  dtype: enum
+  options: ['complex', 'float', 'int', 'short', 'byte']
+  option_labels: [Complex, Float, Int, Short, Byte]
+  hide: part
+- id: test_name_filter
+  label: Test Name Filter
+  dtype: string
+  default: ".*"
+- id: stop_after_sample
+  label: Stop After Sample
+  dtype: int
+  default: samp_rate
+  hide: none
+- id: delay_before_close_s
+  label: Teardown Delay (s)
+  dtype: float
+  default: '1'
+  hide: 'part'
+
+inputs:
+- domain: stream
+  dtype: ${ type }
+
+file_format: 1

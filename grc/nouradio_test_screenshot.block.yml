@@ -1,0 +1,66 @@
+#
+# Copyright 2024 nou Systems, Inc.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+id: nouradio_test_screenshot
+label: 'Test: Screenshot'
+category: '[nouRadio Test]'
+
+templates:
+  imports: from gnuradio import nouradio_test
+  make: |-
+    None
+    if ${auto_maximize}:
+        self.showMaximized()
+    
+    self.${id} = nouradio_test.screenshot("${type}", ${test_name_filter}, int(${delay_samples}), int(${period_samples}), ${auto_crop}, ${crop}, ${monitor}, self)
+
+parameters:
+-   id: type
+    label: Input Type
+    dtype: enum
+    options: ['complex', 'float', 'int', 'short', 'byte']
+    option_labels: [Complex, Float, Int, Short, Byte]
+    hide: part
+- id: test_name_filter
+  label: Test Name Filter
+  dtype: string
+  default: '.*'
+  hide: none
+- id: delay_samples
+  label: Delay (samples)
+  dtype: int
+  default: 'samp_rate'
+- id: period_samples
+  label: Period (samples)
+  dtype: int
+  default: '-1'
+  hide: ${'none' if period_samples > 0 else 'part'}
+- id: auto_maximize
+  label: Maximize Window
+  dtype: bool
+  default: 'False'
+  hide: part
+- id: auto_crop
+  label: Crop To Window
+  dtype: bool
+  default: 'True'
+  hide: part
+- id: crop
+  label: Coordinates (X,Y,W,H)
+  dtype: int_vector
+  default: "[0,0,1,1]"
+  hide: ${'all' if auto_crop else 'none'}
+- id: monitor
+  label: Monitor
+  dtype: int
+  default: '1'
+  hide: ${'all' if auto_crop else 'none'}
+
+inputs:
+-   domain: stream
+    dtype: ${ type }
+
+file_format: 1

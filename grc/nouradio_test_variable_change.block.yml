@@ -1,0 +1,60 @@
+#
+# Copyright 2024 nou Systems, Inc.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+id: nouradio_test_variable_change
+label: 'Test: Variable Change'
+category: '[nouRadio Test]'
+
+templates:
+  imports: from gnuradio import nouradio_test
+  make: nouradio_test.variable_change(${test_name_filter}, '${mode}', ${variable}, ${start_value}, ${stop_value}, ${step}, ${count}, ${choices}, ${value})
+
+parameters:
+- id: test_name_filter
+  label: Test Name Filter
+  dtype: string
+  default: ".*"
+- id: mode
+  label: Mode
+  dtype: enum
+  default: constant
+  options: [constant, range, linspace, choices]
+  option_labels: [constant, range, linspace, choices]
+- id: variable
+  label: Variable Block ID
+  dtype: string
+  default: ""
+- id: start_value
+  label: Start
+  dtype: float
+  default: 0
+  hide: ${ 'all' if mode not in ['range','linspace'] else 'none'}
+- id: stop_value
+  label: Stop
+  dtype: float
+  default: 100
+  hide: ${ 'all' if mode not in ['range','linspace'] else 'none'}
+- id: step
+  label: Step
+  dtype: float
+  default: 1
+  hide: ${ 'all' if mode!='range' else 'none'}
+- id: count
+  label: Count
+  dtype: int
+  default: 100
+  hide: ${ 'all' if mode!='linspace' else 'none'}
+- id: choices
+  label: Choices
+  dtype: string
+  default: ""
+  hide: ${ 'all' if mode!='choices' else 'none'}
+- id: value
+  label: Value
+  default: 0
+  hide: ${ 'all' if mode!='constant' else 'none'}
+
+file_format: 1

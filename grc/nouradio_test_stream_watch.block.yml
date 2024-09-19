@@ -1,0 +1,53 @@
+#
+# Copyright 2024 nou Systems, Inc.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+id: nouradio_test_stream_watch
+label: 'Test: Stream Watch'
+category: '[nouRadio Test]'
+
+templates:
+  imports: from gnuradio import nouradio_test
+  make: nouradio_test.stream_watch('${type}', ${test_name_filter}, ${save_to}, '${mode}', ${upper_bound}, ${lower_bound})
+
+parameters:
+- id: type
+  label: Type
+  dtype: enum
+  options: ['float', 'int', 'uint', 'short', 'ushort', 'char', 'uchar']
+  option_labels: [Float, Int, UInt, Short, UShort, Char, UChar]
+  option_attributes:
+    gr_type: ['float', 'int', 'int', 'short', 'short', 'byte', 'byte']
+  hide: part
+- id: test_name_filter
+  label: Test Name Filter
+  dtype: string
+  default: ".*"
+- id: save_to
+  label: Filename
+  dtype: string
+  default: ""
+- id: mode
+  label: Nominal Behavior
+  dtype: enum
+  options: ['above', 'below', 'inside', 'outside']
+  option_labels: ['>= Limit', '<= Limit', 'Inside Bounds', 'Outside Bounds']
+  hide: none
+- id: upper_bound
+  label: Upper Bound
+  dtype: float
+  default: 1.0
+  hide: ${ 'all' if mode == 'above' else 'none' }
+- id: lower_bound
+  label: Lower Bound
+  dtype: float
+  default: -1.0
+  hide: ${ 'all' if mode == 'below' else 'none' }
+
+inputs:
+- domain: stream
+  dtype: ${ type.gr_type }
+
+file_format: 1

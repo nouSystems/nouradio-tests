@@ -1,0 +1,77 @@
+#
+# Copyright 2024 nou Systems, Inc.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+id: nouradio_test_run_tests_wrapper
+label: 'Test: Run Tests'
+category: '[nouRadio Test]'
+
+templates:
+  imports: from gnuradio import nouradio_test
+  make: |-
+    None
+    # Get the currently-executing grc file; no need to make the user enter it.
+    def ${ 'get_grc_file_' + context.get('id')() }():
+        from pathlib import Path
+        grc_path = Path(__file__).with_suffix('.grc')
+        return grc_path
+    def ${ 'stop_flowgraph_' + context.get('id')() }():
+        import time
+        # Some USB radios require a more elegant closing process than a
+        # process kill, so pass along a callback to the Qt functions.
+        self.setAttribute(Qt.Qt.WA_DeleteOnClose)
+        # Stopping and exiting the program gracefully requires multiple pieces.
+        # Note that calling self.close() does not work within this callback.
+        # The program stops, but the window never closes.
+        # Note that this exit does not permit other blocks to exit
+        self.stop()
+        time.sleep(${ delay_before_close_s })
+        Qt.QApplication.quit()
+    self.${id} = nouradio_test.run_tests_wrapper("${ type }", ${ 'get_grc_file_' + context.get('id')() }(), ${ staging_dir }, ${ artifacts_dir },
+                int(${stop_after_sample}), ${ 'stop_flowgraph_' + context.get('id')() }, ${ suppress_runner })
+
+parameters:
+- id: type
+  label: Type
+  dtype: enum
+  options: [complex, float, int, short, byte]
+  option_labels: [Complex, Float, Int, Short, Byte]
+  hide: part
+- id: stop_after_sample
+  label: Stop After Sample
+  dtype: int
+  default: samp_rate
+  hide: none
+- id: staging_dir
+  label: Staging Directory
+  dtype: string
+  default: ""
+  hide: ${ "all" if suppress_runner else ("part" if len(staging_dir)==0 else "none") }
+- id: artifacts_dir
+  label: Artifacts Directory
+  dtype: string
+  default: test_artifacts
+  hide: ${ "all" if suppress_runner else "none" }
+- id: suppress_runner
+  label: Disable Test Runner
+  dtype: bool
+  default: False
+  hide: part
+- id: test_name_filter
+  label: Test Name Filter
+  dtype: string
+  default: ".*"
+  hide: all
+- id: delay_before_close_s
+  label: Teardown Delay (s)
+  dtype: float
+  default: '1'
+  hide: 'part'
+
+inputs:
+- domain: stream
+  dtype: ${ type }
+
+file_format: 1

@@ -1,0 +1,29 @@
+#
+# Copyright 2024 nou Systems, Inc.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+id: nouradio_test_enable_disable_blocks
+label: 'Test: Enable/Disable Blocks'
+category: '[nouRadio Test]'
+
+templates:
+  imports: from gnuradio import nouradio_test
+  make: nouradio_test.enable_disable_blocks(${test_name_filter}, ${enable_blocks}, ${disable_blocks})
+
+parameters:
+- id: test_name_filter
+  label: Test Name Filter
+  dtype: string
+  default: ".*"
+- id: enable_blocks
+  label: Enable Blocks
+  dtype: string
+  default: ""
+- id: disable_blocks
+  label: Disable Blocks
+  dtype: string
+  default: ""
+
+file_format: 1

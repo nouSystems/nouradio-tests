@@ -1,0 +1,59 @@
+#
+# Copyright 2024 nou Systems, Inc.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+id: nouradio_test_run_command
+label: 'Test: Run Command'
+category: '[nouRadio Test]'
+
+templates:
+  imports: from gnuradio import nouradio_test
+  make: nouradio_test.run_command('${type}', ${test_name_filter}, '${execute_at}', '${command_type}', ${command}, ${script_path}, ${args})
+
+parameters:
+- id: type
+  label: Type
+  dtype: enum
+  options: [complex, float, int, short, byte]
+  option_labels: [Complex, Float, Int, Short, Byte]
+  hide: part
+- id: test_name_filter
+  label: Test Name Filter
+  dtype: string
+  default: ".*"
+- id: execute_at
+  label: Execute At
+  dtype: enum
+  default: 'start'
+  options: ['start', 'stop']
+  option_labels: [Start, Stop]
+- id: command_type
+  label: Command Type
+  dtype: enum
+  default: 'script'
+  options: ['script', 'command']
+  option_labels: [Script, Command]
+  hide: 'part'
+- id: command
+  label: Command
+  dtype: string
+  default: ""
+  hide: ${ 'none' if command_type=='command' else 'all' }
+- id: script_path
+  label: Script
+  dtype: file_open
+  default: ""
+  hide: ${ 'none' if command_type=='script' else 'all' }
+- id: args
+  label: Script Args
+  dtype: string
+  default: ""
+  hide: ${ 'none' if command_type=='script' else 'all' }
+
+inputs:
+- domain: stream
+  dtype: ${ type }
+
+file_format: 1
